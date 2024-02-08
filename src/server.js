@@ -34,4 +34,32 @@ async function getPilares(page, token) {
     }
 }
 
+async function postPilares() {
+    try {
+        const token = await getToken();
+        console.log("Token:", token);
+
+        for (let page = 0; page <= 4; page++) {
+            const pilares = await getPilares(page, token);
+            console.log("Pilares da página", page, ":", pilares);
+            allPilares.push(...pilares.data);
+        }
+
+        const stringPilares = allPilares.join("");
+        console.log("Pilares concatenados:", stringPilares);
+
+        const base64Pilares = Buffer.from(stringPilares).toString('base64');
+        console.log("Pilares em base64:", base64Pilares);
+
+        const urlPostPilares = `https://instance.fique.online/webhook/merge/88d8701e-a1d6-4fee-b15b-53e90dc1d126/envia_resposta/7b56940678e89802e02e1981a8657206d639f657d4c58efb8d8fb74814799d1c001ec121c6?api_token=${token}`;
+        const response = await axios.post(urlPostPilares, {
+            answer: base64Pilares
+        });
+        console.log("Resposta do envio:", response.data);
+    } catch (error) {
+        console.error("Erro ao enviar os pilares:", error.message);
+    }
+}
+
+postPilares();
 
